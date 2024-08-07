@@ -19,6 +19,8 @@ import com.example.model.Role;
 import com.example.service.IPermissionService;
 import com.example.service.IRoleService;
 
+
+
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController {
@@ -27,7 +29,7 @@ public class RoleController {
     private IRoleService roleService;
 
     @Autowired
-    private IPermissionService permissionService;
+    private IPermissionService permiService;
 
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles() {
@@ -43,19 +45,19 @@ public class RoleController {
 
     @PostMapping
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
-        Set<Permission> permissionList = new HashSet<>();
+        Set<Permission> permiList = new HashSet<Permission>();
         Permission readPermission;
 
         // Recuperar la Permission/s por su ID
-        for (Permission per : role.getPermissionList()) {
-            readPermission = permissionService.findById(per.getId()).orElse(null);
+        for (Permission per : role.getPermissionsList()) {
+            readPermission = permiService.findById(per.getId()).orElse(null);
             if (readPermission != null) {
                 //si encuentro, guardo en la lista
-                permissionList.add(readPermission);
+                permiList.add(readPermission);
             }
         }
 
-        role.setPermissionList(permissionList);
+        role.setPermissionsList(permiList);
         Role newRole = roleService.save(role);
         return ResponseEntity.ok(newRole);
     }
