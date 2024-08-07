@@ -19,10 +19,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "roles")
+@Table(name="roles")
 public class Role {
 
     @Id
@@ -30,8 +31,11 @@ public class Role {
     private Long id;
     private String role;
 
+    //Usamos Set porque no permite repetidos
+    //List permite repetidos
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "roles_permissions", joinColumns = @JoinColumn(name = "role_id"),
-        inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    private Set<Permission> permissionList = new HashSet<>();
+    @JoinTable (name = "roles_permissions", joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns=@JoinColumn(name = "permission_id"))
+    private Set<Permission> permissionsList = new HashSet<>();
 }
+
