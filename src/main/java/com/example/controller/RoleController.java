@@ -35,18 +35,21 @@ public class RoleController {
     @Autowired
     private IPermissionService permiService;
 
+    // GET ALL
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles() {
         List<Role> roles = roleService.findAll();
         return ResponseEntity.ok(roles);
     }
 
+    // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
         Optional<Role> role = roleService.findById(id);
         return role.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // CREATE
     @PostMapping
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         Set<Permission> permiList = new HashSet<Permission>();
