@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.example.model.Permission;
 import com.example.repository.IPermissionRepository;
 
-
 @Service
 public class PermissionService implements IPermissionService {
 
@@ -32,6 +31,7 @@ public class PermissionService implements IPermissionService {
 
     @Override
     public void deleteById(Long id) {
+        permissionRepository.deleteRolePermissionsByPermissionId(id);
         permissionRepository.deleteById(id);
     }
 
@@ -40,6 +40,3 @@ public class PermissionService implements IPermissionService {
         return permissionRepository.save(permission);
     }
 }
-
-
-
