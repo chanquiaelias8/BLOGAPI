@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: blog-api
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:blogdb}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 20000
+
+  jpa:
+    hibernate:
+      # Etapa de modelado. Antes del paso de Docker migramos a Flyway con ddl-auto: validate.
+      ddl-auto: update
+    # false a proposito: el default (true) mantiene la sesion de Hibernate abierta durante
+    # el renderizado de la respuesta. Eso oculta los LazyInitializationException en desarrollo
+    # y retiene una conexion del pool mas tiempo del necesario. Con false, cualquier acceso
+    # lazy fuera del service explota en los tests, que es donde queremos que explote.
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    # No filtrar stacktraces ni mensajes internos en las respuestas de error.
+    include-stacktrace: never
+    include-message: never
+
+logging:
+  level:
+    com.debatiendo.blogapi: DEBUG
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:DEBUG}
+
+app:
+  jwt:
+    # Clave HMAC en Base64 (>= 32 bytes decodificados). La del default es SOLO para
+    # desarrollo local: en cualquier entorno real se inyecta por APP_JWT_SECRET.
+    secret: ${APP_JWT_SECRET:jfWIfPyhtmkWeh89CTNRhUw4byStvIRMXmmJGd9aV99I9FfnkF4CRIy8TY8gsWHG}
+    issuer: ${APP_JWT_ISSUER:debatiendo-blog-api}
+    # 15 minutos. Corto a proposito: como el token no se puede revocar antes de expirar,
+    # la ventana de uso de un token robado es exactamente esta. El refresh token
+    # (proxima iteracion) es el que evita que el usuario tenga que re-loguearse.
+    access-token-ttl: ${APP_JWT_ACCESS_TTL:15m}
+
+  bootstrap:
+    admin:
+      username: ${APP_BOOTSTRAP_ADMIN_USERNAME:admin}
+      email: ${APP_BOOTSTRAP_ADMIN_EMAIL:admin@debatiendo.local}
+      # Vacio => se genera una password aleatoria y se loguea una unica vez al arrancar.
+      password: ${APP_BOOTSTRAP_ADMIN_PASSWORD:}
